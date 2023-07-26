@@ -1,14 +1,56 @@
-const http = require('http')
-const {v4 : uuidv4} = require('uuid')
+const express = require('express')
+const mongoose = require("mongoose")
+const app = express()
 
-// const server = http.createServer((req,res) => {
-//     res.statusCode =200;
-//     res.setHeader('Content-Type', 'text/html')
-//     res.end('<h1>Welcome</h1>');
-// })
+mongoose.set('strictQuery', false)
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
 
-// server.listen(3000, '127.0.0.1' , ()=> {
-//     console.log('Server running...');
-// })
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config();
+}
 
-console.log(uuidv4())
+const PORT =process.env.PORT  || 3000
+const CONNECTION = process.env.CONNECTION;
+const customers = [
+    {
+        "name" : "Prashant",
+        "industry": "music"
+    },
+    {
+        "name" : "Ram",
+        "industry": "Sangeet"
+    },
+    {
+        "name" : "Divya",
+        "industry": "Coding"
+    }
+]
+
+app.get('/' , (req,res) => {
+    res.send("Welcome")
+})
+
+app.get('/api/customers' , (req,res) => {
+    res.send({"data":customers})
+})
+
+app.post('/api/customers', (req,res) => {
+    console.log(req.body);
+    res.send(req.body);
+})
+
+
+const start =async() => {
+    try{
+        await mongoose.connect(CONNECTION)
+        app.listen(PORT,() => {
+            console.log('App listening on port ' + PORT);
+        })
+    }
+    catch(e){
+        console.log(e.message)
+    }
+}
+
+start()
